@@ -32,8 +32,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE)
-      d_temp_residual <- filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
+      d_temp_group_v1 <- dplyr::filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE)
+      d_temp_residual <- dplyr::filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,5]
       res_residual[i] <- d_temp_residual[,5]
@@ -49,9 +49,9 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの低い方から
-      d_temp_group_v2 <- filter(var_summary, grp == group_v2 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの高い (より広範囲の) 変数へ
-      d_temp_residual <- filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
+      d_temp_group_v1 <- dplyr::filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの低い方から
+      d_temp_group_v2 <- dplyr::filter(var_summary, grp == group_v2 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの高い (より広範囲の) 変数へ
+      d_temp_residual <- dplyr::filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,5]
       res_group_v2[i] <- d_temp_group_v2[,5]
@@ -82,21 +82,21 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
 
 PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
   d_group_v1 <- data %>%
-    filter(group == group_v1)
+    dplyr::filter(group == group_v1)
   p1 <- ggplot(data = d_group_v1, aes(x = sd_random_effect)) +
     geom_histogram() +
     theme_bw() +
     xlab(group_v1)
 
   d_residual <- data %>%
-    filter(group == "Residual")
+    dplyr::filter(group == "Residual")
   p_residual <- ggplot(data = d_residual, aes(x = sd_random_effect)) +
     geom_histogram() +
     theme_bw() +
     xlab("Residual")
 
   d_total <- data %>%
-    filter(group == "SD_TotalVariance")
+    dplyr::filter(group == "SD_TotalVariance")
   p_total <- ggplot(data = d_total, aes(x = sd_random_effect)) +
     geom_histogram() +
     theme_bw() +
@@ -108,7 +108,7 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
       plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
 
   } else {
-    d2 <- data %>% filter(group == group_v2)
+    d2 <- data %>% dplyr::filter(group == group_v2)
     p2 <- ggplot(data = d2, aes(x = sd_random_effect)) +
       geom_histogram() +
       theme_bw() +
@@ -133,7 +133,7 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
 
 GetProportionOfRandomEffect <- function(data){
   d <- data %>%
-    filter(sd_random_effect > 0.00001) %>%
+    dplyr::filter(sd_random_effect > 0.00001) %>%
     group_by(group) %>%
     summarise(sd_mean_value = mean(sd_random_effect)) %>%
     mutate(variance_pooled = sd_mean_value^2) %>%
