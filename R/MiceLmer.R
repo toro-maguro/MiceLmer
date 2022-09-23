@@ -32,8 +32,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- dplyr::filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE)
-      d_temp_residual <- dplyr::filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
+      d_temp_group_v1 <- dplyr::filter(var_summary, .data$grp == group_v1 & .data$var1 == "(Intercept)" & is.na(.data$var2) == TRUE)
+      d_temp_residual <- dplyr::filter(var_summary, .data$grp == "Residual" & is.na(.data$var1) == TRUE & is.na(.data$var2) == TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,5]
       res_residual[i] <- d_temp_residual[,5]
@@ -49,9 +49,9 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- dplyr::filter(var_summary, grp == group_v1 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの低い方から
-      d_temp_group_v2 <- dplyr::filter(var_summary, grp == group_v2 & var1 == "(Intercept)" & is.na(var2) == TRUE) # レベルの高い (より広範囲の) 変数へ
-      d_temp_residual <- dplyr::filter(var_summary, grp == "Residual" & is.na(var1) == TRUE & is.na(var2) == TRUE)
+      d_temp_group_v1 <- dplyr::filter(var_summary, .data$grp == group_v1 & .data$var1 == "(Intercept)" & is.na(.data$var2) == TRUE) # レベルの低い方から
+      d_temp_group_v2 <- dplyr::filter(var_summary, .data$grp == group_v2 & .data$var1 == "(Intercept)" & is.na(.data$var2) == TRUE) # レベルの高い (より広範囲の) 変数へ
+      d_temp_residual <- dplyr::filter(var_summary, .data$grp == "Residual" & is.na(.data$var1) == TRUE & is.na(.data$var2) == TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,5]
       res_group_v2[i] <- d_temp_group_v2[,5]
@@ -82,22 +82,22 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
 
 PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
   d_group_v1 <- data %>%
-    dplyr::filter(group == group_v1)
-  p1 <- ggplot2::ggplot(data = d_group_v1, aes(x = sd_random_effect)) +
+    dplyr::filter(.data$group == group_v1)
+  p1 <- ggplot2::ggplot(data = d_group_v1, aes(x = .data$sd_random_effect)) +
     ggplot2::geom_histogram() +
     ggplot2::theme_bw() +
     ggplot2::xlab(group_v1)
 
   d_residual <- data %>%
-    dplyr::filter(group == "Residual")
-  p_residual <- ggplot2::ggplot(data = d_residual, aes(x = sd_random_effect)) +
+    dplyr::filter(.data$group == "Residual")
+  p_residual <- ggplot2::ggplot(data = d_residual, aes(x = .data$sd_random_effect)) +
     ggplot2::geom_histogram() +
     ggplot2::theme_bw() +
     ggplot2::xlab("Residual")
 
   d_total <- data %>%
-    dplyr::filter(group == "SD_TotalVariance")
-  p_total <- ggplot2::ggplot(data = d_total, aes(x = sd_random_effect)) +
+    dplyr::filter(.data$group == "SD_TotalVariance")
+  p_total <- ggplot2::ggplot(data = d_total, aes(x = .data$sd_random_effect)) +
     ggplot2::geom_histogram() +
     ggplot2::theme_bw() +
     ggplot2::xlab("SD_TotalVariance")
@@ -108,8 +108,8 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
       patchwork::plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
 
   } else {
-    d2 <- data %>% dplyr::filter(group == group_v2)
-    p2 <- ggplot2::ggplot(data = d2, aes(x = sd_random_effect)) +
+    d2 <- data %>% dplyr::filter(.data$group == group_v2)
+    p2 <- ggplot2::ggplot(data = d2, aes(x = .data$sd_random_effect)) +
       ggplot2::geom_histogram() +
       ggplot2::theme_bw() +
       ggplot2::xlab(group_v2)
@@ -133,13 +133,13 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
 
 GetProportionOfRandomEffect <- function(data){
   d <- data %>%
-    dplyr::filter(sd_random_effect > 0.00001) %>%
-    dplyr::group_by(group) %>%
-    dplyr::summarise(sd_mean_value = mean(sd_random_effect)) %>%
-    dplyr::mutate(variance_pooled = sd_mean_value^2) %>%
+    dplyr::filter(.data$sd_random_effect > 0.00001) %>%
+    dplyr::group_by(.data$group) %>%
+    dplyr::summarise(sd_mean_value = mean(.data$sd_random_effect)) %>%
+    dplyr::mutate(variance_pooled = .data$sd_mean_value^2) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(sum_variance = max(variance_pooled)) %>%
-    dplyr::mutate(proportion_variance = variance_pooled / sum_variance) %>%
-    dplyr::arrange(proportion_variance)
+    dplyr::mutate(sum_variance = max(.data$variance_pooled)) %>%
+    dplyr::mutate(proportion_variance = .data$variance_pooled / .data$sum_variance) %>%
+    dplyr::arrange(.data$proportion_variance)
   return(d)
 }
