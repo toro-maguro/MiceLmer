@@ -1,7 +1,7 @@
 Package: MiceLmer
 Type: Package
 Title: Get pooled estimates of random effects from lmer with multiple imputation based on mice
-Version: 0.0.1
+Version: 0.0.2
 Author: Hiroto Akiyama
 Maintainer: The package maintainer <hirotoakiyama@protonmail.com>
 Description: This is a package for getting pooled random effects from linear mixed model (lmer) with multiple imputation datasets (mice).
@@ -20,4 +20,5 @@ Imports:
     lmerTest,
     broom.mixed,
     patchwork,
-    httr
+    ggplot2,
+    mice

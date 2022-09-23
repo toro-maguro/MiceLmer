@@ -7,17 +7,17 @@
 #' @param group_v2 Clustering variable at three-level multilevel models. group_v2 has to be a level3 variable. If you applying two-level multilevel model, group_v2 has to be NA.
 #' @return data.frame including random effects at lmer results with mice.
 #' @export
-#' @name MiceLmer
-#' @import tidyverse dplyr stats lme4 lmerTest broom.mixed
+#' @name ExtractRandomEffect
+#' @import tidyverse dplyr stats lme4 lmerTest broom.mixed mice
 
 ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_v2 = NA){
   formula <- as.formula(lmer_formula)
   lmer_results <- lapply(1:imputed_datasets$m, function(i){
-    dfm <- complete(imputed_datasets, action=i)
-    lmer(formula = formula,
-         data = dfm,
-         control=lmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),
-         REML = TRUE)
+    dfm <- mice::complete(imputed_datasets, action=i)
+    lme4::lmer(formula = formula,
+               data = dfm,
+               control=lmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)),
+               REML = TRUE)
   })
 
   n_imputation <- imputed_datasets$m
@@ -77,46 +77,46 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
 #' @param group_v2 Clustering variable at three-level multilevel models. group_v2 has to be a level3 variable. If you applying two-level multilevel model, group_v2 has to be NA.
 #' @return distributions of random effects
 #' @export
-#' @name MiceLmer
-#' @import tidyverse patchwork dplyr stats
+#' @name PlotRandomEffectDistribution
+#' @import tidyverse patchwork dplyr stats ggplot2
 
 PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
   d_group_v1 <- data %>%
     dplyr::filter(group == group_v1)
-  p1 <- ggplot(data = d_group_v1, aes(x = sd_random_effect)) +
-    geom_histogram() +
-    theme_bw() +
-    xlab(group_v1)
+  p1 <- ggplot2::ggplot(data = d_group_v1, aes(x = sd_random_effect)) +
+    ggplot2::geom_histogram() +
+    ggplot2::theme_bw() +
+    ggplot2::xlab(group_v1)
 
   d_residual <- data %>%
     dplyr::filter(group == "Residual")
-  p_residual <- ggplot(data = d_residual, aes(x = sd_random_effect)) +
-    geom_histogram() +
-    theme_bw() +
-    xlab("Residual")
+  p_residual <- ggplot2::ggplot(data = d_residual, aes(x = sd_random_effect)) +
+    ggplot2::geom_histogram() +
+    ggplot2::theme_bw() +
+    ggplot2::xlab("Residual")
 
   d_total <- data %>%
     dplyr::filter(group == "SD_TotalVariance")
-  p_total <- ggplot(data = d_total, aes(x = sd_random_effect)) +
-    geom_histogram() +
-    theme_bw() +
-    xlab("SD_TotalVariance")
+  p_total <- ggplot2::ggplot(data = d_total, aes(x = sd_random_effect)) +
+    ggplot2::geom_histogram() +
+    ggplot2::theme_bw() +
+    ggplot2::xlab("SD_TotalVariance")
 
   if (is.na(group_v2) == TRUE){
     plot <- p1 / (p_residual | p_total) +
-      plot_layout(ncol = 1) +
-      plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
+      patchwork::plot_layout(ncol = 1) +
+      patchwork::plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
 
   } else {
     d2 <- data %>% dplyr::filter(group == group_v2)
-    p2 <- ggplot(data = d2, aes(x = sd_random_effect)) +
-      geom_histogram() +
-      theme_bw() +
-      xlab(group_v2)
+    p2 <- ggplot2::ggplot(data = d2, aes(x = sd_random_effect)) +
+      ggplot2::geom_histogram() +
+      ggplot2::theme_bw() +
+      ggplot2::xlab(group_v2)
 
     plot <- (p1 | p2) / (p_residual | p_total) +
-      plot_layout(ncol = 1) +
-      plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
+      patchwork::plot_layout(ncol = 1) +
+      patchwork::plot_annotation(title = "distributions of standard deviation in random effects (intercept)")
 
   }
   return(plot)
@@ -128,18 +128,18 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
 #' @param data output of ExtractRandomEffect function.
 #' @return dataframe including random effect parameters (variance and standard deviation) and proportions of the total variance
 #' @export
-#' @name MiceLmer
+#' @name GetProportionOfRandomEffect
 #' @import tidyverse dplyr
 
 GetProportionOfRandomEffect <- function(data){
   d <- data %>%
     dplyr::filter(sd_random_effect > 0.00001) %>%
-    group_by(group) %>%
-    summarise(sd_mean_value = mean(sd_random_effect)) %>%
-    mutate(variance_pooled = sd_mean_value^2) %>%
-    ungroup() %>%
-    mutate(sum_variance = max(variance_pooled)) %>%
-    mutate(proportion_variance = variance_pooled / sum_variance) %>%
-    arrange(proportion_variance)
+    dplyr::group_by(group) %>%
+    dplyr::summarise(sd_mean_value = mean(sd_random_effect)) %>%
+    dplyr::mutate(variance_pooled = sd_mean_value^2) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(sum_variance = max(variance_pooled)) %>%
+    dplyr::mutate(proportion_variance = variance_pooled / sum_variance) %>%
+    dplyr::arrange(proportion_variance)
   return(d)
 }
