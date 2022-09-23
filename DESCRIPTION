@@ -4,12 +4,20 @@ Title: Get pooled estimates of random effects from lmer with multiple imputation
 Version: 0.0.1
 Author: Hiroto Akiyama
 Maintainer: The package maintainer <hirotoakiyama@protonmail.com>
-Description: This is a package for getting pooled random effects from linear mixed model (lmer) with multiple imputation datasets (mice) 
-    - Extract estimates of randome effects
-    - Plot distributions of random effects to check normality of estimates
-    - Pool random effects 
+Description: This is a package for getting pooled random effects from linear mixed model (lmer) with multiple imputation datasets (mice).
+    - Extract estimates of randome effect parameters.
+    - Plot distributions of random effect parameters to check normality of estimates.
+    - Pool random effects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
+Imports:
+    tidyverse,
+    dplyr,
+    lme4,
+    lmerTest,
+    broom.mixed,
+    patchwork,
+    httr
