@@ -32,8 +32,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- subset(var_summary, subset = var_summary$grp == group_v1 & var_summary$var1 == "(Intercept)" & is.na(res_table$var2)==TRUE)
-      d_temp_residual <- subset(var_summary, subset = var_summary$grp == "Residual" & is.na(res_table$var1)==TRUE & is.na(res_table$var2)==TRUE)
+      d_temp_group_v1 <- subset(var_summary, subset = var_summary$grp == group_v1 & var_summary$var1 == "(Intercept)" & is.na(var_summary$var2)==TRUE)
+      d_temp_residual <- subset(var_summary, subset = var_summary$grp == "Residual" & is.na(var_summary$var1)==TRUE & is.na(var_summary$var2)==TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,"sdcor"]
       res_residual[i] <- d_temp_residual[,"sdcor"]
@@ -49,9 +49,9 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- subset(var_summary, subset = var_summary$grp == group_v1 & var_summary$var1 == "(Intercept)" & is.na(res_table$var2)==TRUE) # レベルの低い方から
-      d_temp_group_v2 <- subset(var_summary, subset = var_summary$grp == group_v2 & var_summary$var1 == "(Intercept)" & is.na(res_table$var2)==TRUE) # レベルの高い (より広範囲の) 変数へ
-      d_temp_residual <- subset(var_summary, subset = var_summary$grp == "Residual" & is.na(res_table$var1)==TRUE & is.na(res_table$var2)==TRUE)
+      d_temp_group_v1 <- subset(var_summary, subset = var_summary$grp == group_v1 & var_summary$var1 == "(Intercept)" & is.na(var_summary$var2)==TRUE) # レベルの低い方から
+      d_temp_group_v2 <- subset(var_summary, subset = var_summary$grp == group_v2 & var_summary$var1 == "(Intercept)" & is.na(var_summary$var2)==TRUE) # レベルの高い (より広範囲の) 変数へ
+      d_temp_residual <- subset(var_summary, subset = var_summary$grp == "Residual" & is.na(var_summary$var1)==TRUE & is.na(var_summary$var2)==TRUE)
 
       res_group_v1[i] <- d_temp_group_v1[,"sdcor"]
       res_group_v2[i] <- d_temp_group_v2[,"sdcor"]
