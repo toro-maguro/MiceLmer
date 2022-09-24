@@ -8,7 +8,7 @@
 #' @return data.frame including random effects at lmer results with mice.
 #' @export
 #' @name ExtractRandomEffect
-#' @import tidyverse dplyr stats lme4 lmerTest broom.mixed mice
+#' @import tidyverse dplyr lme4 lmerTest broom.mixed mice
 
 ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_v2 = NA){
   formula <- as.formula(lmer_formula)
@@ -90,7 +90,7 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
 #' @return distributions of random effects
 #' @export
 #' @name PlotRandomEffectDistribution
-#' @import tidyverse patchwork dplyr stats ggplot2
+#' @import tidyverse patchwork dplyr ggplot2
 
 PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
   d_group_v1 <- data[data$group == group_v1]
