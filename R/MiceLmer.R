@@ -1,6 +1,7 @@
 #' @title Extract random effects from lmer with multiple imputation datasets using mice
 #' @description \code{ExtractRandomEffect} Return dataframe including random effects at lmer results with mice
 #'
+#' @param n_levels level of multilevel models
 #' @param imputed_datasets mice output.
 #' @param lmer_formula Formula for lmer. The class of this parameter has to be character.
 #' @param group_v1 Clustering variable. If you applying three-level multilevel model, group_v1 has to be a level2 variable.
@@ -10,7 +11,7 @@
 #' @name ExtractRandomEffect
 #' @import tidyverse dplyr lme4 lmerTest broom.mixed mice
 
-ExtractRandomEffect <- function(levels = 2, imputed_datasets, lmer_formula, group_v1, group_v2 = NULL){
+ExtractRandomEffect <- function(n_levels = 2, imputed_datasets, lmer_formula, group_v1, group_v2 = NULL){
   formula <- as.formula(lmer_formula)
   lmer_results <- lapply(1:imputed_datasets$m, function(i){
     dfm <- mice::complete(imputed_datasets, action=i)
@@ -27,7 +28,7 @@ ExtractRandomEffect <- function(levels = 2, imputed_datasets, lmer_formula, grou
   res_residual <- numeric(n_imputation)
   res_total_variance <- numeric(n_imputation)
 
-  if (levels == 2){
+  if (n_levels == 2){
     for (i in 1:n_imputation){
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
@@ -53,7 +54,7 @@ ExtractRandomEffect <- function(levels = 2, imputed_datasets, lmer_formula, grou
     df_total_variance <- data.frame(m, group = "SD_TotalVariance", sd_random_effect = res_total_variance)
 
     df <- rbind(df_group_v1, df_residual, df_total_variance)
-  } else if (levels == 3) {
+  } else if (n_levels == 3) {
     for (i in 1:n_imputation){
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)

@@ -4,9 +4,17 @@
 \alias{ExtractRandomEffect}
 \title{Extract random effects from lmer with multiple imputation datasets using mice}
 \usage{
-ExtractRandomEffect(imputed_datasets, lmer_formula, group_v1, group_v2 = NA)
+ExtractRandomEffect(
+  n_levels = 2,
+  imputed_datasets,
+  lmer_formula,
+  group_v1,
+  group_v2 = NULL
+)
 }
 \arguments{
+\item{n_levels}{level of multilevel models}
+
 \item{imputed_datasets}{mice output.}
 
 \item{lmer_formula}{Formula for lmer. The class of this parameter has to be character.}
