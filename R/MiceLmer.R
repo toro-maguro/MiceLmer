@@ -10,7 +10,7 @@
 #' @name ExtractRandomEffect
 #' @import tidyverse dplyr lme4 lmerTest broom.mixed mice
 
-ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_v2 = NA){
+ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_v2 = NULL){
   formula <- as.formula(lmer_formula)
   lmer_results <- lapply(1:imputed_datasets$m, function(i){
     dfm <- mice::complete(imputed_datasets, action=i)
@@ -27,7 +27,7 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
   res_residual <- numeric(n_imputation)
   res_total_variance <- numeric(n_imputation)
 
-  if (is.na(group_v2) == TRUE){
+  if (is.null(group_v2) == TRUE){
     for (i in 1:n_imputation){
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
@@ -40,7 +40,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       d_temp_group_v1 <- var_summary %>%
         dplyr::filter(.data[[col_grp]] == group_v1 & .data[[col_var1]] == "(Intercept)" & is.na(.data[[col_var2]]) == TRUE) %>%
         select(.data[[col_sdcor]])
-      d_temp_residual <- var_summary %>% dplyr::filter(.data[[col_grp]] == "Residual" & is.na(.data[[col_var1]]) == TRUE & is.na(.data[[col_var2]]) == TRUE) %>%
+      d_temp_residual <- var_summary %>%
+        dplyr::filter(.data[[col_grp]] == "Residual" & is.na(.data[[col_var1]]) == TRUE & is.na(.data[[col_var2]]) == TRUE) %>%
         select(.data[[col_sdcor]])
 
       res_group_v1[i] <- d_temp_group_v1[1,1]
