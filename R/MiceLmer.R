@@ -57,7 +57,7 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       d_temp_group_v2 <- dplyr::filter(var_summary, .data[[col_grp]] == group_v2 & .data[[col_var1]] == "(Intercept)" & is.na(.data[[col_var2]]) == TRUE) # レベルの高い (より広範囲の) 変数へ
       d_temp_residual <- dplyr::filter(var_summary, .data[[col_grp]] == "Residual" & is.na(.data[[col_var2]]) == TRUE & is.na(.data[[col_var2]]) == TRUE)
 
-      res_group_v1[i] <- d_temp_group_v1[,5]
+      res_group_v1[i] <- d_temp_group_v1[,"sdcor"]
       res_group_v2[i] <- d_temp_group_v2[,5]
       res_residual[i] <- d_temp_residual[,5]
       res_total_variance[i] <- sqrt(sum(var_summary$vcov)) # total varianceを取ってSD計算
