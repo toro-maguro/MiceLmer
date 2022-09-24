@@ -35,8 +35,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       d_temp_group_v1 <- subset(var_summary, subset = grp == group_v1 & var1 == "(Intercept)" & is.na(res_table$var2)==TRUE)
       d_temp_residual <- subset(var_summary, subset = grp == "Residual" & is.na(res_table$var1)==TRUE & is.na(res_table$var2)==TRUE)
 
-      res_group_v1[i] <- d_temp_group_v1[1,5]
-      res_residual[i] <- d_temp_residual[1,5]
+      res_group_v1[i] <- d_temp_group_v1[,"sdcor"]
+      res_residual[i] <- d_temp_residual[,"sdcor"]
       res_total_variance[i] <- sqrt(sum(var_summary$vcov)) # total varianceを取ってSD計算
     }
     df_group_v1 <- data.frame(m, group = group_v1, sd_random_effect = res_group_v1)
@@ -53,9 +53,9 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       d_temp_group_v2 <- subset(var_summary, subset = grp == group_v2 & var1 == "(Intercept)" & is.na(res_table$var2)==TRUE) # レベルの高い (より広範囲の) 変数へ
       d_temp_residual <- subset(var_summary, subset = grp == "Residual" & is.na(res_table$var1)==TRUE & is.na(res_table$var2)==TRUE)
 
-      res_group_v1[i] <- d_temp_group_v1[1,5]
-      res_group_v2[i] <- d_temp_group_v2[1,5]
-      res_residual[i] <- d_temp_residual[1,5]
+      res_group_v1[i] <- d_temp_group_v1[,"sdcor"]
+      res_group_v2[i] <- d_temp_group_v2[,"sdcor"]
+      res_residual[i] <- d_temp_residual[,"sdcor"]
       res_total_variance[i] <- sqrt(sum(var_summary$vcov)) # total varianceを取ってSD計算
     }
     df_group_v1 <- data.frame(m, group = group_v1, sd_random_effect = res_group_v1)
