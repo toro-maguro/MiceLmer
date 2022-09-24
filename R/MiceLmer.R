@@ -10,7 +10,7 @@
 #' @name ExtractRandomEffect
 #' @import tidyverse dplyr lme4 lmerTest broom.mixed mice
 
-ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_v2 = NULL){
+ExtractRandomEffect <- function(levels = 2, imputed_datasets, lmer_formula, group_v1, group_v2 = NULL){
   formula <- as.formula(lmer_formula)
   lmer_results <- lapply(1:imputed_datasets$m, function(i){
     dfm <- mice::complete(imputed_datasets, action=i)
@@ -27,7 +27,7 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
   res_residual <- numeric(n_imputation)
   res_total_variance <- numeric(n_imputation)
 
-  if (is.null(group_v2) == TRUE){
+  if (levels == 2){
     for (i in 1:n_imputation){
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
@@ -53,7 +53,7 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
     df_total_variance <- data.frame(m, group = "SD_TotalVariance", sd_random_effect = res_total_variance)
 
     df <- rbind(df_group_v1, df_residual, df_total_variance)
-  } else {
+  } else if (levels == 3) {
     for (i in 1:n_imputation){
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
@@ -142,14 +142,23 @@ PlotRandomEffectDistribution <- function(data, group_v1, group_v2 = NA){
 #' @import tidyverse dplyr
 
 GetProportionOfRandomEffect <- function(data){
+  col_group <- colnames(data)[2]
+  col_sd_random_effect <- colnames(data)[3]
+
   d <- data %>%
-    dplyr::filter(.data[["sd_random_effect"]] > 0.00001) %>%
-    dplyr::group_by(.data[["group"]]) %>%
-    dplyr::summarise(sd_mean_value = mean(.data[["sd_random_effect"]])) %>%
-    dplyr::mutate(variance_pooled = .data[["sd_random_effect"]]^2) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(sum_variance = max(.data[["variance_pooled"]])) %>%
-    dplyr::mutate(proportion_variance = .data[["variance_pooled"]] / .data[["sum_variance"]]) %>%
-    dplyr::arrange(.data[["proportion_variance"]])
+    dplyr::filter(.data[[col_sd_random_effect]] > 0.00001) %>%
+    dplyr::group_by(.data[[col_group]]) %>%
+    dplyr::summarise(sd_mean_value = mean(.data[[col_sd_random_effect]])) %>%
+    dplyr::mutate(variance_pooled = .data[[col_sd_random_effect]]^2) %>%
+    dplyr::ungroup()
+
+  col_variance_pooled <- colnames(d)[3]
+  d <- d %>%
+    dplyr::mutate(sum_variance = max(.data[[col_variance_pooled]]))
+
+  col_sum <- colnames(d)[4]
+  d <- d %>%
+    dplyr::mutate(proportion_variance = .data[[col_variance_pooled]] / .data[[col_sum]]) %>%
+    arrange(.data[[col_variance_pooled]])
   return(d)
 }
