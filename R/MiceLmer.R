@@ -32,8 +32,8 @@ ExtractRandomEffect <- function(imputed_datasets, lmer_formula, group_v1, group_
       lmer_summary <- summary(lmer_results[[i]])
       var_summary <- as.data.frame(lmer_summary$varcor)
 
-      d_temp_group_v1 <- dplyr::filter(var_summary, .data[["grp"]] == group_v1 & .data[["var1"]] == "(Intercept)" & is.na(.data[["var2"]]) == TRUE)
-      d_temp_residual <- dplyr::filter(var_summary, .data[["grp"]] == "Residual" & is.na(.data[["var1"]]) == TRUE & is.na(.data[["var2"]]) == TRUE)
+      d_temp_group_v1 <- var_summary[var_summary$grp == group_v1 & var_summary$var1 == "Intercept" & is.na(var_summary$var2)]
+      d_temp_residual <- var_summary[var_summary$grp == "Residual" & is.na(var_summary$var1) & is.na(var_summary$var2)]
 
       res_group_v1[i] <- d_temp_group_v1[,5]
       res_residual[i] <- d_temp_residual[,5]
